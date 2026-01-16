@@ -27,7 +27,10 @@ body {
   color: var(--text);
 }
 
-/* общий контейнер для экранов со "старт/коды" */
+/* ----------------------------
+   Shared (Start/Codes screens)
+----------------------------- */
+
 .container {
   min-height: 100dvh;
   display: grid;
@@ -58,9 +61,7 @@ p {
   opacity: 0.9;
 }
 
-small, .muted {
-  color: var(--muted);
-}
+small, .muted { color: var(--muted); }
 
 .btn {
   width: 100%;
@@ -78,93 +79,6 @@ small, .muted {
 .btn:active { transform: translateY(1px); }
 .btn:hover { opacity: 0.95; }
 
-.codeBox {
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px dashed rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.02);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 15px;
-  white-space: pre-wrap;
-}
-
-.video {
-  width: 100%;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: #000;
-}
-
-/* FULLSCREEN waiting show */
-.waitingStage {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 22px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* лёгкая виньетка поверх */
-.waitingStage::before {
-  content: "";
-  position: absolute;
-  inset: -40px;
-  background: radial-gradient(900px 600px at 50% 35%, rgba(255,255,255,0.05), rgba(0,0,0,0.95) 70%);
-  pointer-events: none;
-}
-
-.waitingInner {
-  position: relative;
-  width: 100%;
-  max-width: 980px;
-  text-align: center;
-  padding: 10px 0 40px;
-}
-
-.bigPhrase {
-  font-size: clamp(28px, 6vw, 56px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.08;
-  margin: 0;
-  text-wrap: balance;
-  opacity: 0;
-  transform: translateY(10px);
-  filter: blur(10px);
-  transition: opacity 900ms ease, transform 900ms ease, filter 900ms ease;
-}
-
-.bigPhrase.show {
-  opacity: 1;
-  transform: translateY(0px);
-  filter: blur(0px);
-}
-
-/* progress bar */
-.progressWrap {
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  bottom: 18px;
-  height: 12px; /* было 6px */
-  border-radius: 999px;
-  background: var(--track);
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  width: 100%;
-  background: var(--fill);
-  border-radius: 999px;
-  transform-origin: left;
-  transform: scaleX(0);
-  will-change: transform;
-  transition: transform 80ms linear;
-}
-
-/* reset link */
 .resetLink {
   margin-top: 10px;
   font-size: 13px;
@@ -177,45 +91,9 @@ small, .muted {
   padding: 0;
 }
 
-.videoStage {
-  min-height: 100dvh;
-  width: 100%;
-  background: #000;
-  position: relative;
-  overflow: hidden;
-}
-
-.videoStage video {
-  width: 100%;
-  height: 100dvh;
-  object-fit: cover; /* если хочешь без обрезки — поставь contain */
-  display: block;
-  background: #000;
-}
-
-.videoOverlayBtn {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none; /* включим только кнопке */
-}
-
-.videoOverlayBtn button {
-  pointer-events: auto;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(0,0,0,0.35);
-  color: rgba(255,255,255,0.9);
-  padding: 14px 18px;
-  border-radius: 999px;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
-  cursor: pointer;
-  transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
-}
-
-.videoOverlayBtn button:hover { background: rgba(0,0,0,0.45); }
-.videoOverlayBtn button:active { transform: translateY(1px); }
+/* ----------------------------
+   Codes list (per-code copy)
+----------------------------- */
 
 .codesList {
   margin-top: 12px;
@@ -232,10 +110,7 @@ small, .muted {
   padding: 12px 12px;
   border-top: 1px solid rgba(255,255,255,0.06);
 }
-
-.codeRow:first-child {
-  border-top: 0;
-}
+.codeRow:first-child { border-top: 0; }
 
 .codeText {
   flex: 1;
@@ -257,16 +132,9 @@ small, .muted {
   cursor: pointer;
   transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
 }
+.copyBtn:hover { background: rgba(255,255,255,0.06); }
+.copyBtn:active { transform: translateY(1px); }
 
-.copyBtn:hover {
-  background: rgba(255,255,255,0.06);
-}
-
-.copyBtn:active {
-  transform: translateY(1px);
-}
-
-/* маленький бейдж “Скопировано” */
 .copiedBadge {
   position: absolute;
   right: 0;
@@ -286,8 +154,202 @@ small, .muted {
 
   transition: opacity 160ms ease, transform 160ms ease;
 }
-
 .copiedBadge.show {
   opacity: 1;
   transform: translateY(-12px);
+}
+
+/* ----------------------------
+   Fullscreen waiting stage
+----------------------------- */
+
+.waitingStage {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* виньетка */
+.waitingStage::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(
+    900px 600px at 50% 35%,
+    rgba(255,255,255,0.05),
+    rgba(0,0,0,0.95) 70%
+  );
+  pointer-events: none;
+}
+
+/* Канвас фиксированной ширины — "как на десктопе" */
+.waitingCanvas {
+  width: 980px;
+  max-width: 980px;
+  margin: 0 auto;
+  position: relative;
+  text-align: center;
+  padding: 10px 0 40px;
+  z-index: 1;
+}
+
+/* строки */
+.linesStack {
+  display: grid;
+  gap: 14px;
+  justify-items: stretch;
+  padding: 8px 0 30px;
+}
+
+.line {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(12px);
+  transition:
+    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.line.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 3-колоночная сетка: [лево][буква][право] */
+.lineGrid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  width: 100%;
+}
+
+.lineLeft { justify-self: end; text-align: right; min-width: 0; }
+.lineRight { justify-self: start; text-align: left; min-width: 0; }
+
+.lineGrid,
+.lineLeft,
+.lineMid,
+.lineRight {
+  font-size: clamp(18px, 3.2vw, 30px);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+/* Буква до раскрытия секрета — белая */
+.lineMidDim {
+  color: rgba(255,255,255,1);
+  text-shadow: none;
+  transition: color 450ms ease, text-shadow 450ms ease;
+}
+
+/* Буква после раскрытия секрета — красная */
+.lineMidRed {
+  color: #ff3b3b;
+  text-shadow: 0 0 18px rgba(255, 59, 59, 0.25);
+  transition: color 450ms ease, text-shadow 450ms ease;
+}
+
+/* progress bar */
+.progressWrap {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 18px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: var(--fill);
+  border-radius: 999px;
+  transform-origin: left;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+.progressFill.animate {
+  animation: fillbar var(--waitDuration, 9000ms) linear forwards;
+}
+
+@keyframes fillbar {
+  to { transform: scaleX(1); }
+}
+
+/* ----------------------------
+   Fullscreen video stage
+----------------------------- */
+
+.videoStage {
+  min-height: 100dvh;
+  width: 100%;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.videoStage video {
+  width: 100%;
+  height: 100dvh;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.videoOverlayBtn {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.videoOverlayBtn button {
+  pointer-events: auto;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(0,0,0,0.35);
+  color: rgba(255,255,255,0.9);
+  padding: 14px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
+}
+
+.videoOverlayBtn button:hover { background: rgba(0,0,0,0.45); }
+.videoOverlayBtn button:active { transform: translateY(1px); }
+
+/* ----------------------------
+   Mobile: keep same layout, just scale canvas
+----------------------------- */
+
+@media (max-width: 520px) {
+  .waitingStage {
+    place-items: start center;
+    padding: 0;
+    padding-top: 32px;
+  }
+
+  .waitingCanvas {
+    transform-origin: top center;
+    transform: scale(calc((100vw - 24px) / 980));
+  }
+
+  .progressWrap {
+    left: 12px;
+    right: 12px;
+    height: 10px;
+  }
 }

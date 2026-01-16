@@ -1,80 +1,143 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+export type WaitingLine = {
+  text: string;
+  highlightIndex: number;
+};
+
+function LineGrid({
+  text,
+  highlightIndex,
+  midStyle,
+  revealSecret,
+}: {
+  text: string;
+  highlightIndex: number;
+  midStyle?: React.CSSProperties;
+  revealSecret: boolean;
+}) {
+  const safeIndex =
+    highlightIndex >= 0 && highlightIndex < text.length ? highlightIndex : 0;
+
+  const left = text.slice(0, safeIndex);
+  const mid = text[safeIndex];
+  const right = text.slice(safeIndex + 1);
+
+  return (
+    <div className="lineGrid">
+      <span className="lineLeft">{left}</span>
+      <span
+        className={`lineMid ${revealSecret ? "lineMidRed" : "lineMidDim"}`}
+        style={midStyle}
+      >
+        {mid}
+      </span>
+      <span className="lineRight">{right}</span>
+    </div>
+  );
+}
 
 export default function WaitingShow({
-  phrases,
+  lines,
   onDone,
 }: {
-  phrases: string[];
+  lines: WaitingLine[];
   onDone: () => void;
 }) {
-  const [idx, setIdx] = useState(0);
-  const [show, setShow] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [revealSecret, setRevealSecret] = useState(false);
 
-  // тайминги (мс) — можешь подкрутить
-  const fadeIn = 900;
-  const visible = 1400;
-  const fadeOut = 700;
-  const gap = 250;
+  // тайминги
+  const firstDelayMs = 200;
+  const revealEveryMs = 2600; // чтение строки
+  const gapBeforeNextMs = 600; // пауза перед следующей
+  const finalHoldMs = 5200; // после того как буквы покраснели
 
-  const totalPerPhrase = fadeIn + visible + fadeOut + gap;
-  const totalDuration = totalPerPhrase * phrases.length;
+  const stepMs = revealEveryMs + gapBeforeNextMs;
 
-  const rafRef = useRef<number | null>(null);
+  // полоса должна закончиться ровно к переходу на видео
+  const totalDuration = useMemo(() => {
+    return (
+      firstDelayMs + (lines.length - 1) * stepMs + revealEveryMs + finalHoldMs
+    );
+  }, [lines.length, stepMs]);
 
-  // Плавный общий прогресс от 0 до 100
+  const timeoutsRef = useRef<number[]>([]);
+
   useEffect(() => {
-    const start = performance.now();
+    timeoutsRef.current.forEach((t) => window.clearTimeout(t));
+    timeoutsRef.current = [];
 
-    const frame = () => {
-      const elapsed = performance.now() - start;
-      const p = Math.min(100, (elapsed / totalDuration) * 100);
-      setProgress(p);
+    setVisibleCount(0);
+    setRevealSecret(false);
 
-      if (p < 100) {
-        rafRef.current = requestAnimationFrame(frame);
-      }
-    };
+    // 1) первая строка
+    timeoutsRef.current.push(
+      window.setTimeout(() => setVisibleCount(1), firstDelayMs),
+    );
 
-    rafRef.current = requestAnimationFrame(frame);
+    // 2) остальные строки
+    for (let i = 2; i <= lines.length; i += 1) {
+      timeoutsRef.current.push(
+        window.setTimeout(
+          () => setVisibleCount(i),
+          firstDelayMs + (i - 1) * stepMs,
+        ),
+      );
+    }
+
+    // последняя строка появилась
+    const lastAppearsAt = firstDelayMs + (lines.length - 1) * stepMs;
+
+    // 3) красим буквы ПОСЛЕ прочтения последней строки
+    const revealSecretAt = lastAppearsAt + revealEveryMs;
+    timeoutsRef.current.push(
+      window.setTimeout(() => setRevealSecret(true), revealSecretAt),
+    );
+
+    // 4) переход на видео
+    timeoutsRef.current.push(
+      window.setTimeout(onDone, revealSecretAt + finalHoldMs),
+    );
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      timeoutsRef.current.forEach((t) => window.clearTimeout(t));
+      timeoutsRef.current = [];
     };
-  }, [totalDuration]);
-
-  // Переключение фраз + fade in/out
-  useEffect(() => {
-    let t1: number | undefined;
-    let t2: number | undefined;
-    let t3: number | undefined;
-
-    setShow(false);
-
-    t1 = window.setTimeout(() => setShow(true), 120);
-    t2 = window.setTimeout(() => setShow(false), fadeIn + visible);
-    t3 = window.setTimeout(() => {
-      if (idx >= phrases.length - 1) onDone();
-      else setIdx((v) => v + 1);
-    }, fadeIn + visible + fadeOut + gap);
-
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
-    };
-  }, [idx, phrases.length, onDone]);
+  }, [lines.length, onDone, stepMs]);
 
   return (
     <div className="waitingStage">
-      <div className="waitingInner">
-        <h2 className={`bigPhrase ${show ? "show" : ""}`}>{phrases[idx]}</h2>
+      {/* Это “канвас”, который на мобилке будет скейлиться CSS-ом */}
+      <div className="waitingCanvas">
+        <div className="linesStack">
+          {lines.map((line, idx) => (
+            <div key={idx} className={`line ${idx < visibleCount ? "show" : ""}`}>
+              <LineGrid
+                text={line.text}
+                highlightIndex={line.highlightIndex}
+                revealSecret={revealSecret}
+                midStyle={
+                  idx === 3
+                    ? { padding: "0 2px 0 6px" } // 4-я строка
+                    : idx === 6
+                    ? { padding: "0 6px 0 2px" } // 7-я строка
+                    : undefined
+                }
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="progressWrap" aria-label="Loading progress">
         <div
-          className="progressFill"
-          style={{ transform: `scaleX(${progress / 100})` }}
+          className="progressFill animate"
+          style={
+            {
+              ["--waitDuration" as any]: `${totalDuration}ms`,
+            } as React.CSSProperties
+          }
         />
       </div>
     </div>

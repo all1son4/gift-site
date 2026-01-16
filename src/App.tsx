@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StartScreen from "./components/StartScreen";
 import WaitingShow from "./components/WaitingShow";
+import type { WaitingLine } from "./components/WaitingShow";
 import PatienceVideo from "./components/PatienceVideo";
 import CodesScreen from "./components/CodesScreen";
 
@@ -9,19 +10,36 @@ type Step = "start" | "waiting" | "video" | "codes";
 const LS_KEY = "giftUnlocked";
 
 const PHRASES = [
-  "Подключаемся к серверам Санта-Щ.И.Т.",
-  "Проверяем уровень твоей выдержки…",
-  "Сверяем протоколы терпения…",
-  "Почти готово. Но не торопись 🙂",
-  "Последняя проверка…",
-  "Секундочку…",
-  "Ну всё, сейчас появится подарок…",
+  "Готов ли ты к приобретению заслуженного дара?",
+  "Всё, что ты хотел бы получить, но достоин ли?",
+  "Контролируй свои желания, овладей ими.",
+  "Терпение ведёт к спокойствию, а спокойствие к умиротворению.",
+  "Свобода или время? Временная свобода или свободное время?",
+  "Выбор за тобой, но поступать следует обдуманно.",
+  "Вкуси же плоды, собранные теми, кто верен тебе.",
 ];
+
+// Важно: длина SECRET должна совпадать с количеством строк
+const SECRET = "нуисоси";
 
 const CODES = ["PSN-XXXX-XXXX-XXXX", "PSN-YYYY-YYYY-YYYY"];
 
+function buildLines(phrases: string[], secret: string): WaitingLine[] {
+  return phrases.map((text, i) => {
+    const target = (secret[i] ?? "").toLowerCase();
+    const idx = target ? text.toLowerCase().indexOf(target) : -1;
+
+    return {
+      text,
+      highlightIndex: idx >= 0 ? idx : 0,
+    };
+  });
+}
+
 export default function App() {
   const [step, setStep] = useState<Step>("start");
+
+  const waitingLines = useMemo(() => buildLines(PHRASES, SECRET), []);
 
   useEffect(() => {
     const unlocked = localStorage.getItem(LS_KEY) === "1";
@@ -38,17 +56,14 @@ export default function App() {
     setStep("start");
   };
 
-  // FULLSCREEN этап с большими фразами
   if (step === "waiting") {
-    return <WaitingShow phrases={PHRASES} onDone={() => setStep("video")} />;
+    return <WaitingShow lines={waitingLines} onDone={() => setStep("video")} />;
   }
 
-  // FULLSCREEN видео без текста/рамок
   if (step === "video") {
     return <PatienceVideo src="/captain.mp4" onEnded={unlock} />;
   }
 
-  // Старт и коды — в карточке
   return (
     <div className="container">
       <div className="card">
