@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export type WaitingLine = {
   text: string;
@@ -56,11 +56,11 @@ export default function WaitingShow({
   const stepMs = revealEveryMs + gapBeforeNextMs;
 
   // полоса должна закончиться ровно к переходу на видео
-  const totalDuration = useMemo(() => {
-    return (
-      firstDelayMs + (lines.length - 1) * stepMs + revealEveryMs + finalHoldMs
-    );
-  }, [lines.length, stepMs]);
+//   const totalDuration = useMemo(() => {
+//     return (
+//       firstDelayMs + (lines.length - 1) * stepMs + revealEveryMs + finalHoldMs
+//     );
+//   }, [lines.length, stepMs]);
 
   const timeoutsRef = useRef<number[]>([]);
 
