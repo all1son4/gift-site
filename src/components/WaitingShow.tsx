@@ -108,29 +108,34 @@ export default function WaitingShow({
 
   return (
     <div className="waitingStage">
-      {/* Это “канвас”, который на мобилке будет скейлиться CSS-ом */}
       <div className="waitingCanvas">
-        <div className="linesStack">
-          {lines.map((line, idx) => (
-            <div key={idx} className={`line ${idx < visibleCount ? "show" : ""}`}>
-              <LineGrid
-                text={line.text}
-                highlightIndex={line.highlightIndex}
-                revealSecret={revealSecret}
-                midStyle={
-                  idx === 3
-                    ? { padding: "0 2px 0 6px" } // 4-я строка
-                    : idx === 6
-                    ? { padding: "0 6px 0 2px" } // 7-я строка
-                    : undefined
-                }
-              />
-            </div>
-          ))}
+        <div className="waitingCanvasInner">
+          <div className="linesStack">
+            {lines.map((line, idx) => (
+              <div
+                key={idx}
+                className={`line ${idx < visibleCount ? "show" : ""}`}
+              >
+                <LineGrid
+                  text={line.text}
+                  highlightIndex={line.highlightIndex}
+                  revealSecret={revealSecret}
+                  midStyle={
+                    idx === 3
+                      ? { padding: "0 2px 0 6px" } // 4-я строка
+                      : idx === 6
+                      ? { padding: "0 6px 0 2px" } // 7-я строка
+                      : undefined
+                  }
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="progressWrap" aria-label="Loading progress">
+      {/* Если захочешь вернуть прогресс — просто раскомменть */}
+      {/* <div className="progressWrap" aria-label="Loading progress">
         <div
           className="progressFill animate"
           style={
@@ -139,7 +144,7 @@ export default function WaitingShow({
             } as React.CSSProperties
           }
         />
-      </div>
+      </div> */}
     </div>
   );
 }

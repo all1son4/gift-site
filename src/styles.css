@@ -18,10 +18,21 @@
 
 html, body {
   height: 100%;
+  width: 100%;
   margin: 0;
 }
 
+/* Override default Vite template root constraints (max-width/padding/margins) */
+#root {
+  width: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+
 body {
+  min-height: 100dvh;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background: radial-gradient(1200px 900px at 50% 30%, var(--bg1), var(--bg0));
   color: var(--text);
@@ -164,12 +175,15 @@ small, .muted { color: var(--muted); }
 ----------------------------- */
 
 .waitingStage {
+  width: 100vw;
   min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 22px;
   position: relative;
   overflow: hidden;
+
+  background: radial-gradient(1200px 900px at 50% 30%, var(--bg1), var(--bg0));
 }
 
 /* виньетка */
@@ -185,7 +199,7 @@ small, .muted { color: var(--muted); }
   pointer-events: none;
 }
 
-/* Канвас фиксированной ширины — "как на десктопе" */
+/* Канвас фиксированной ширины — desktop */
 .waitingCanvas {
   width: 980px;
   max-width: 980px;
@@ -194,6 +208,10 @@ small, .muted { color: var(--muted); }
   text-align: center;
   padding: 10px 0 40px;
   z-index: 1;
+}
+
+.waitingCanvasInner {
+  width: 980px;
 }
 
 /* строки */
@@ -223,7 +241,7 @@ small, .muted { color: var(--muted); }
 /* 3-колоночная сетка: [лево][буква][право] */
 .lineGrid {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: baseline;
   width: 100%;
 }
@@ -332,7 +350,7 @@ small, .muted { color: var(--muted); }
 .videoOverlayBtn button:active { transform: translateY(1px); }
 
 /* ----------------------------
-   Mobile: keep same layout, just scale canvas
+   Mobile: same grid, just narrower + smaller font
 ----------------------------- */
 
 @media (max-width: 520px) {
@@ -343,13 +361,31 @@ small, .muted { color: var(--muted); }
   }
 
   .waitingCanvas {
-    transform-origin: top center;
-    transform: scale(calc((100vw - 24px) / 980));
+    width: 100%;
+    max-width: 980px;
+    padding: 10px 12px 40px;
   }
 
-  .progressWrap {
-    left: 12px;
-    right: 12px;
-    height: 10px;
+  .waitingCanvasInner {
+    width: 100%;
+  }
+
+  .linesStack { gap: 12px; }
+
+  .lineGrid,
+  .lineLeft,
+  .lineMid,
+  .lineRight {
+    font-size: clamp(14px, 4.3vw, 18px);
+    line-height: 1.22;
+    text-wrap: normal; /* важно: без balance на мобилке */
+  }
+
+  /* ВОТ ЭТО главное: НЕ ломаем слова внутри */
+  .lineLeft,
+  .lineRight {
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: auto;
   }
 }
