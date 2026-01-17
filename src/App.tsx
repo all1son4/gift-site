@@ -157,7 +157,7 @@ export default function App() {
   };
 
   if (step === "waiting") {
-    return <WaitingShow lines={waitingLines} onDone={() => null} />;
+    return <WaitingShow lines={waitingLines} onDone={() => setStep("video")} />;
   }
 
   if (step === "video") {
