@@ -19,10 +19,9 @@ const PHRASES = [
   "Вкуси же плоды, собранные теми, кто верен тебе.",
 ];
 
-// длина SECRET должна совпадать с количеством строк
 const SECRET = "нуисоси";
 
-const CODES = ["PSN-XXXX-XXXX-XXXX", "PSN-YYYY-YYYY-YYYY"];
+const CODES = ["XMDP-CB27-M5GN","JLC5-4QMF-J6EF"];
 
 function useMediaQuery(query: string) {
   const get = () =>

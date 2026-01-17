@@ -27,7 +27,7 @@ function CopyIcon({ size = 18 }: { size?: number }) {
 
 export default function CodesScreen({
   codes,
-  onReset,
+  // onReset,
 }: {
   codes: string[];
   onReset?: () => void;
@@ -71,11 +71,11 @@ export default function CodesScreen({
         ))}
       </div>
 
-      {onReset && (
+      {/* {onReset && (
         <button className="resetLink" onClick={onReset}>
           Reset (для теста)
         </button>
-      )}
+      )} */}
     </div>
   );
 }
